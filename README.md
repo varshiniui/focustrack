@@ -1,134 +1,163 @@
-# FocusTrack — Chrome Extension for Time Tracking & Productivity Analytics
+# FocusTrack
 
-A Chrome extension that tracks time spent on websites, classifies them as productive or unproductive, blocks distracting sites, and shows detailed analytics — CodTech Full Stack Internship Task 4.
-
----
-
-## ✨ Features
-
-- ⏱️ **Automatic time tracking** — tracks every website you visit in real time
-- 📊 **Productivity classification** — sites auto-classified as productive or unproductive
-- 🚫 **Site blocker** — block distracting sites; shows a focused blocked page instead
-- 🎯 **Daily goals** — set a daily productive time goal and track progress
-- 📈 **Full dashboard** — today's stats, weekly bar chart, top sites table
-- 💾 **PostgreSQL backend** — all data persisted to a database
-- 🔔 **Popup widget** — quick stats right from the extension icon
+A Chrome extension that tracks time spent on websites, classifies activity as productive or unproductive, blocks distracting sites, and surfaces analytics through a full dashboard. Built as part of the CodTech Full Stack Internship — Task 4.
 
 ---
 
-## 🗂️ Project Structure
+## Overview
+
+FocusTrack runs silently in the background while you browse. Every tab switch and page visit is timed and logged to a PostgreSQL database through a local Node.js server. The extension popup gives you a quick snapshot of your day, while the dashboard provides deeper weekly analytics and settings.
+
+---
+
+## Features
+
+- Automatic time tracking across all websites
+- Productive vs unproductive site classification
+- Site blocker with a custom blocked page
+- Daily productive time goal with progress tracking
+- Full analytics dashboard with weekly bar chart and top sites table
+- Per-user data isolation
+- Auto-saves every 30 seconds, retries if server is unreachable
+
+---
+
+## Project Structure
 
 ```
 task4/
 ├── .gitignore
 ├── README.md
 ├── server/
-│   ├── server.js        # Express REST API + PostgreSQL
-│   ├── setup.sql        # Database setup script
+│   ├── server.js          REST API and PostgreSQL integration
+│   ├── setup.sql          Database creation script
 │   └── package.json
 └── extension/
-    ├── manifest.json    # Chrome extension config (Manifest V3)
-    ├── background.js    # Service worker — tracks active tab time
-    ├── popup.html       # Extension popup UI
-    ├── popup.js         # Popup logic
-    ├── dashboard.html   # Full analytics dashboard page
-    ├── dashboard.js     # Dashboard charts & data
-    ├── blocked.html     # Shown when visiting a blocked site
-    ├── block_rules.json # Declarative net request rules
-    └── icons/           # Extension icons (16, 48, 128px)
+    ├── manifest.json      Chrome Manifest V3 configuration
+    ├── background.js      Service worker — tracks active tab time
+    ├── popup.html         Extension toolbar popup
+    ├── popup.js           Popup data fetching and rendering
+    ├── dashboard.html     Full analytics dashboard page
+    ├── dashboard.js       Dashboard charts and settings logic
+    ├── blocked.html       Page shown when visiting a blocked site
+    ├── block_rules.json   Declarative net request placeholder
+    └── icons/             Extension icons at 16, 48, and 128px
 ```
+
+> Note: `chart.min.js` (Chart.js v4.4.0) is excluded from version control. Download it from `https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js` and place it in the `extension/` folder before loading the extension.
 
 ---
 
-## 🚀 Getting Started
+## Prerequisites
 
-### Prerequisites
-- Google Chrome browser
-- Node.js v16+
+- Google Chrome
+- Node.js v16 or higher
 - PostgreSQL installed and running
 
-### 1. Set up the database
+---
+
+## Setup
+
+### 1. Create the database
 
 ```bash
-psql -U postgres -f server/setup.sql
+psql -U postgres -c "CREATE DATABASE focustrack;"
 ```
 
-### 2. Configure your password
+### 2. Configure the server
 
-Open `server/server.js` line ~14 and set your PostgreSQL password:
+Open `server/server.js` and update the database password on line 14:
+
 ```js
 password: process.env.PG_PASSWORD || "your_password_here",
 ```
 
 ### 3. Set your username
 
-Open `extension/background.js` line 4:
+Open `extension/background.js` and set your name on line 2:
+
 ```js
 const USER_ID = "your_name";
 ```
 
-### 4. Start the server
+Also update the same value in `extension/popup.js` line 2 and `extension/dashboard.js` where the user ID is referenced.
+
+### 4. Download Chart.js
+
+Download the file from the URL below and save it as `chart.min.js` inside the `extension/` folder:
+
+```
+https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js
+```
+
+### 5. Start the server
 
 ```bash
 cd server
 npm install
 npm start
 ```
-Server runs at `http://localhost:3002`
 
-### 5. Load the extension in Chrome
+The server runs at `http://localhost:3002`. On first start it automatically creates all required database tables and seeds default site categories.
 
-1. Open Chrome → go to `chrome://extensions`
-2. Enable **Developer Mode** (top right toggle)
-3. Click **Load unpacked**
-4. Select the `extension/` folder
-5. FocusTrack icon appears in your toolbar!
+### 6. Load the extension in Chrome
 
----
-
-## 🧪 How to Test
-
-- **Track time**: Browse any website — the extension tracks automatically
-- **View popup**: Click the FocusTrack icon in the toolbar
-- **Open dashboard**: Click "Dashboard →" in the popup
-- **Block a site**: Type a domain in the popup or dashboard settings → Block
-- **Set goal**: Go to Dashboard → Settings → set your daily productive hours
-- **Custom categories**: Dashboard → Settings → override any site's category
+1. Open Chrome and navigate to `chrome://extensions`
+2. Enable Developer Mode using the toggle in the top right
+3. Click Load unpacked and select the `extension/` folder
+4. The FocusTrack icon will appear in the Chrome toolbar
 
 ---
 
-## 🔌 API Endpoints
+## Usage
+
+Once the server is running and the extension is loaded, browsing happens automatically. The extension tracks every active tab in the background.
+
+**Popup** — click the toolbar icon to see current tracking status, today's productive time against your goal, top sites, and a quick block input.
+
+**Dashboard** — click Dashboard in the popup to open the full analytics page. It includes today's breakdown, a weekly chart, top sites table, goal settings, blocked sites management, and site category overrides.
+
+**Blocking a site** — type a domain in the block input (e.g. `instagram.com`) and click Block. The next time that site is visited, the browser will redirect to the blocked page instead.
+
+**Setting a goal** — go to Dashboard, open Settings, and enter your daily productive hours target. The popup and dashboard will track progress against it throughout the day.
+
+---
+
+## API Reference
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/log` | Log time for a domain |
-| GET | `/api/stats/today` | Today's stats by user |
-| GET | `/api/stats/weekly` | Last 7 days stats |
-| GET | `/api/blocked` | Get blocked sites |
+| GET | `/api/stats/today` | Today's stats for a user |
+| GET | `/api/stats/weekly` | Last 7 days of stats |
+| GET | `/api/blocked` | List blocked sites |
 | POST | `/api/blocked` | Block a site |
 | DELETE | `/api/blocked/:domain` | Unblock a site |
 | GET | `/api/categories` | List site categories |
-| POST | `/api/categories` | Set/override site category |
+| POST | `/api/categories` | Override a site's category |
 | POST | `/api/goal` | Set daily productive goal |
 
----
-
-## 🛠️ Tech Stack
-
-- **Extension**: Chrome Manifest V3, Vanilla JS
-- **Charts**: Chart.js
-- **Backend**: Node.js, Express
-- **Database**: PostgreSQL
-- **Fonts**: Sora (Google Fonts)
+All endpoints accept an optional `user_id` query parameter to scope data per user.
 
 ---
 
-## 👩‍💻 Author
+## Tech Stack
 
-Built for **CodTech Full Stack Internship — Task 4**
+| Layer | Technology |
+|-------|-----------|
+| Extension | Chrome Manifest V3, Vanilla JavaScript |
+| Charts | Chart.js v4 |
+| Backend | Node.js, Express |
+| Database | PostgreSQL |
 
 ---
 
-## 📄 License
+## Author
+
+Built for CodTech Full Stack Internship Task 4.
+
+---
+
+## License
 
 MIT
