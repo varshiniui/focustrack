@@ -1,0 +1,91 @@
+block<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Site Blocked — FocusTrack</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #0f1520 0%, #1a2540 100%);
+      font-family: 'Sora', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      color: #e8edf5;
+    }
+    .card {
+      text-align: center;
+      padding: 60px 48px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(224,108,117,0.2);
+      border-radius: 16px;
+      max-width: 480px;
+      width: 90%;
+    }
+    .icon { font-size: 56px; margin-bottom: 24px; }
+    .title {
+      font-size: 28px; font-weight: 600;
+      letter-spacing: -0.02em; margin-bottom: 10px;
+    }
+    .site {
+      font-size: 18px; color: #e06c75;
+      font-weight: 500; margin-bottom: 16px;
+    }
+    .msg {
+      font-size: 14px; color: rgba(232,237,245,0.5);
+      line-height: 1.7; margin-bottom: 36px;
+    }
+    .btn {
+      display: inline-block; padding: 12px 28px;
+      border-radius: 8px; font-family: 'Sora', sans-serif;
+      font-size: 12px; letter-spacing: 0.18em;
+      text-transform: uppercase; font-weight: 500;
+      cursor: pointer; text-decoration: none;
+      transition: all 0.2s; border: none;
+    }
+    .btn-back {
+      background: linear-gradient(135deg, #3d5a8a, #5b8fd4);
+      color: #fff; margin-right: 10px;
+    }
+    .btn-unblock {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(232,237,245,0.6);
+    }
+    .logo {
+      margin-top: 36px; font-size: 13px;
+      color: rgba(232,237,245,0.25); letter-spacing: 0.1em;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">🚫</div>
+    <div class="title">Site Blocked</div>
+    <div class="site" id="site-name">—</div>
+    <div class="msg">
+      You blocked this site to stay focused.<br />
+      Stay on track — your goals are worth it.
+    </div>
+    <button class="btn btn-back" onclick="history.back()">← Go Back</button>
+    <button class="btn btn-unblock" id="unblock-btn">Unblock</button>
+    <div class="logo">FocusTrack · Stay Focused</div>
+  </div>
+
+  <script>
+    const SERVER = "http://localhost:3002";
+    const params = new URLSearchParams(location.search);
+    const site   = params.get("site") || "this site";
+    document.getElementById("site-name").textContent = site;
+
+    document.getElementById("unblock-btn").addEventListener("click", async () => {
+      if (!confirm(`Unblock ${site}?`)) return;
+      chrome.runtime.sendMessage({ type: "GET_USER_ID" }, async ({ userId }) => {
+        await fetch(`${SERVER}/api/blocked/${encodeURIComponent(site)}?user_id=${userId}`, { method: "DELETE" });
+        chrome.runtime.sendMessage({ type: "RELOAD_BLOCKED" });
+        history.back();
+      });
+    });
+  </script>
+</body>
+</html>

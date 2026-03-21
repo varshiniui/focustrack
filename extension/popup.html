@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FocusTrack</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 320px;
+      min-height: 400px;
+      background: linear-gradient(145deg, #0f1520 0%, #1a2540 100%);
+      font-family: 'Sora', sans-serif;
+      font-weight: 300;
+      color: #e8edf5;
+      padding: 18px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .logo { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; color: #fff; }
+    .logo-dot {
+      display: inline-block; width: 5px; height: 5px;
+      background: #5b8fd4; border-radius: 50%;
+      vertical-align: super; margin-left: 2px;
+      box-shadow: 0 0 5px #5b8fd4;
+    }
+    .dash-btn {
+      background: rgba(91,143,212,0.15);
+      border: 1px solid rgba(91,143,212,0.3);
+      border-radius: 5px; padding: 5px 10px;
+      color: #5b8fd4; font-family: 'Sora', sans-serif;
+      font-size: 9px; letter-spacing: 0.18em;
+      text-transform: uppercase; cursor: pointer;
+    }
+    .current-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(91,143,212,0.2);
+      border-radius: 10px; padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+    .card-label {
+      font-size: 8px; letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(232,237,245,0.35); margin-bottom: 6px;
+    }
+    .current-site {
+      font-size: 14px; font-weight: 500; color: #fff;
+      white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; margin-bottom: 3px;
+    }
+    .current-time { font-size: 11px; color: #5b8fd4; }
+    .cat-badge {
+      display: inline-block; padding: 2px 8px;
+      border-radius: 100px; font-size: 9px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      font-weight: 500; margin-top: 5px;
+    }
+    .cat-productive   { background: rgba(98,203,161,0.15); color: #62cba1; border: 1px solid rgba(98,203,161,0.3); }
+    .cat-unproductive { background: rgba(224,108,117,0.15); color: #e06c75; border: 1px solid rgba(224,108,117,0.3); }
+    .cat-neutral      { background: rgba(91,143,212,0.15);  color: #5b8fd4; border: 1px solid rgba(91,143,212,0.3); }
+
+    .goal-section { margin-bottom: 14px; }
+    .goal-bar-wrap {
+      background: rgba(255,255,255,0.06);
+      border-radius: 100px; height: 5px;
+      overflow: hidden; margin: 6px 0 5px;
+    }
+    .goal-bar-fill {
+      height: 100%; border-radius: 100px;
+      background: linear-gradient(90deg, #3d5a8a, #5b8fd4);
+      transition: width 0.5s ease; width: 0%;
+    }
+    .goal-text {
+      display: flex; justify-content: space-between;
+      font-size: 10px; color: rgba(232,237,245,0.4);
+    }
+    .goal-text span:first-child { color: #5b8fd4; font-weight: 500; }
+
+    .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 12px 0; }
+
+    .sites-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .site-row { display: flex; align-items: center; gap: 8px; }
+    .site-name {
+      font-size: 11px; color: rgba(232,237,245,0.7);
+      width: 110px; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis; flex-shrink: 0;
+    }
+    .site-bar-wrap {
+      flex: 1; background: rgba(255,255,255,0.06);
+      border-radius: 100px; height: 4px; overflow: hidden;
+    }
+    .site-bar-fill { height: 100%; border-radius: 100px; }
+    .productive-bar   { background: linear-gradient(90deg, #3d8a6a, #62cba1); }
+    .unproductive-bar { background: linear-gradient(90deg, #8a3d44, #e06c75); }
+    .site-dur {
+      font-size: 10px; color: rgba(232,237,245,0.4);
+      width: 40px; text-align: right; flex-shrink: 0;
+    }
+    .empty {
+      font-size: 11px; color: rgba(232,237,245,0.3);
+      font-style: italic; text-align: center; padding: 8px 0;
+    }
+
+    .block-row { display: flex; gap: 6px; }
+    .block-input {
+      flex: 1; background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px; padding: 7px 10px;
+      font-family: 'Sora', sans-serif;
+      font-size: 11px; color: #e8edf5; outline: none;
+    }
+    .block-input::placeholder { color: rgba(232,237,245,0.25); }
+    .block-btn {
+      background: rgba(224,108,117,0.15);
+      border: 1px solid rgba(224,108,117,0.3);
+      border-radius: 6px; padding: 7px 12px;
+      color: #e06c75; font-family: 'Sora', sans-serif;
+      font-size: 10px; letter-spacing: 0.1em;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">FocusTrack<span class="logo-dot"></span></div>
+    <button class="dash-btn" id="open-dash">Dashboard →</button>
+  </div>
+
+  <div class="current-card">
+    <div class="card-label">Now Tracking</div>
+    <div class="current-site" id="current-site">Loading…</div>
+    <div class="current-time" id="current-time">—</div>
+    <div id="current-cat"></div>
+  </div>
+
+  <div class="goal-section">
+    <div class="card-label">Today's Productive Goal</div>
+    <div class="goal-bar-wrap">
+      <div class="goal-bar-fill" id="goal-fill"></div>
+    </div>
+    <div class="goal-text">
+      <span id="goal-done">0m</span>
+      <span id="goal-total">Goal: 4h</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card-label">Top Sites Today</div>
+  <div class="sites-list" id="sites-list">
+    <div class="empty">No data yet today.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card-label" style="margin-bottom:8px">Block a Site</div>
+  <div class="block-row">
+    <input class="block-input" id="block-input" placeholder="e.g. instagram.com" />
+    <button class="block-btn" id="block-btn">Block</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
