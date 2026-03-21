@@ -1,7 +1,6 @@
 # FocusTrack
 
-A Chrome extension that tracks time spent on websites, classifies activity as productive or unproductive, blocks distracting sites, and surfaces analytics through a full dashboard. Built as part of the CodTech Full Stack Internship — Task 4.
-
+A Chrome extension that tracks time spent on websites, classifies activity as productive or unproductive, blocks distracting sites, and surfaces analytics through a full dashboard. 
 ---
 
 ## Overview
