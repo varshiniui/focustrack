@@ -1,18 +1,4 @@
 # FocusTrack
-
-*COMPANY* : CODTECH IT SOLUTIONS
-
-*NAME* : SAHAYA VARSHINI M J
-
-*INTERN ID* : CTIS7104
-
-*DOMAIN* : FULL STAACK WEB DEVELOPMENT
-
-*DURATION* : 6 WEEKS
-
-*MENTOR* : NEELA SANTOSH
-
-
 A Chrome extension that tracks time spent on websites, classifies activity as productive or unproductive, blocks distracting sites, and surfaces analytics through a full dashboard. 
 ---
 
